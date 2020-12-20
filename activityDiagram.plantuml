@@ -1,0 +1,68 @@
+@startuml activityDiagram
+
+skinparam backgroundColor #CAE1FF
+skinparam activity {
+  StartColor green
+  EndColor red
+  BackgroundColor #f0ffff
+  BorderColor #000033
+  ArrowColor #191970 
+}
+skinparam ActivityDiamondBackgroundColor #f0ffff
+skinparam ActivityDiamondBorderColor #000033
+
+|Ride Giver|
+
+|Ride Sharing Application|
+start 
+:signIn/signUp;
+if (verifyUserID) then ([successful])
+    if (userRequest) then ([offer ride])
+        |Ride Giver|
+        :fill\nStartAddress\nAnd\nEndAddress;
+        |Ride Sharing Application|
+        if (verifyDrivingLicence) then ([authorized])
+            |Ride Giver|
+            :viewNearbyRideTakers;
+            if () then ([acceptARide])
+                |Ride Sharing Application|
+                :sendConfirmation;
+                :sendRideTakerDetails;
+            else ([cancel])
+            endif
+            |Ride Giver|
+            :exit;
+            stop
+        else ([unauthorized])
+        endif
+    else ([take ride])
+        |Ride Taker|
+        :fill\nPickupAddress\nAnd\nDropAddress;
+        |Ride Sharing Application|
+        if (verifyIdProof) then ([authorized])
+            |Ride Taker|
+            :viewAvailableRideGivers;
+            if () then ([confirmARide])
+                |Ride Sharing Application|
+                :sendConfirmation;
+                :sendRideGiverDetails;
+            else ([cancel])
+            endif
+            |Ride Taker|
+            stop
+        else ([unauthorized])
+    endif
+endif
+
+|Ride Sharing Application|
+:sendErrorMessage;
+
+else ([unsuccessful])  
+    |Ride Sharing Application|
+    :sendErrorMessage;
+endif
+
+
+stop
+
+@enduml

@@ -1,0 +1,141 @@
+@startuml SequenceDiagram1
+
+skinparam BackgroundColor #CAE1FF
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor #000033
+skinparam ParticipantBackgroundColor #f0ffff
+skinparam ParticipantBorderColor #000033
+skinparam SequenceLifeLineBackgroundColor #75cbec
+skinparam SequenceLifeLineBorderColor #000033
+skinparam ArrowColor #191970
+skinparam Linetype ortho
+skinparam ActorBackgroundColor #f0ffff
+skinparam ActorBorderColor #000033
+participant ":Web Application" order 20
+participant ":Server" order 30
+participant ":Company Database" order 40
+
+skinparam style strictuml
+skinparam SequenceMessageAlignment center
+
+title Sequence Diagram 1
+
+actor User
+
+alt [SignIn]
+
+    User -> ":Web Application" : logs(username,password)
+    activate ":Web Application"
+    ":Web Application" -> ":Company Database" : checks(username,password)
+    activate ":Company Database"    
+     
+        group break
+        ":Company Database" -->> ":Server" : invalid credentials
+        activate ":Server"
+        User -> ":Web Application" : ForgotPassword
+        ":Web Application" -> ":Company Database" : check(emailID)
+        ":Company Database" -->> User : sendResetLink
+        User ->> ":Web Application" : enternewpassword
+        ":Web Application" -> ":Company Database" : reset(password) 
+        ":Company Database" -->> ":Company Database" : update(password)
+        end
+
+    ":Company Database" -->> ":Server" : credentials verified
+    deactivate ":Company Database"    
+      
+    ":Server" -->> ":Web Application" : Login Success
+    deactivate ":Web Application"
+    deactivate ":Server"
+        
+    ":Web Application" -->> User : LoginStatus(success)
+
+
+else [SignUp]
+    User -> ":Web Application" : logs(email/google/PhoneNo.facebook)   
+    activate ":Web Application"
+    ":Web Application" -->> ":Company Database" : register(username,password) 
+    activate ":Company Database"    
+    activate ":Server"
+        
+    ":Company Database" -->> ":Server" : Registration Successful
+    ":Server" -->> ":Web Application" : Login Successful
+    deactivate ":Server"
+        
+    deactivate ":Web Application"
+    deactivate ":Company Database"    
+     
+    ":Web Application" -->> User : LoginStatus(success)
+
+end
+
+newpage
+
+User ->> ":Web Application" : select(GiveRide/TakeRide) 
+activate ":Web Application"
+
+note over ":Server" , ":Company Database"
+
+User has to select either to Offer a Ride or to Take a Ride
+
+endnote
+
+":Web Application" -->> ":Web Application" : TakeDetails
+deactivate ":Web Application"
+
+alt [GIVE_RIDE]
+    User ->> ":Web Application" : enterdetails(StartAddress,EndAddress)
+    activate ":Web Application"
+    ":Web Application" -> ":Company Database" : verify(DrivingLicense)
+     activate ":Company Database"    
+         group break
+            ":Company Database" -->> ":Server" : VerificatonUnauthorized
+            activate ":Server"
+        
+            ":Server" -->> ":Web Application" : SendErrorMessage
+    
+        end 
+    ":Company Database" -->> ":Web Application" : Verificaton Successful
+    deactivate ":Company Database"    
+     
+    ":Web Application" -->> User : ViewNearbyRideTakers
+    User -> ":Web Application" : ConfirmRideTaker
+    ":Web Application" -> ":Server" : ConfirmationRequest
+    ":Server" -->> ":Server" :UpdateDetails 
+    ":Server" -->> ":Web Application" : SendConfirmation
+    deactivate ":Server"
+        
+    deactivate ":Web Application"
+    ":Web Application" -->> User : SendRideTakerDetails
+
+
+else [TAKE_RIDE]
+    User ->> ":Web Application" : enterdetails(PickupAddress,DropAddress)
+    activate ":Web Application"
+    ":Web Application" -> ":Company Database" : verify(IdentityProof)
+     activate ":Company Database"    
+     
+     group break
+            ":Company Database" -->> ":Server" : VerificatonUnauthorized
+           activate ":Server"
+            ":Server" -->> ":Web Application" : SendErrorMessage
+    
+    end 
+    ":Company Database" -->> ":Web Application" : Verificaton Successful
+    deactivate ":Company Database"    
+    
+    ":Web Application" -->> User : ViewNearbyRideGivers
+    User -> ":Web Application" : ConfirmRide
+    ":Web Application" -> ":Server" : ConfirmationRequest
+    ":Server" -->> ":Server" :UpdateDetails
+    ":Server" -->> ":Web Application" : SendConfirmation
+    deactivate ":Server"
+        
+    ":Web Application" -->> User : SendRideGiverDetails
+    deactivate ":Web Application"
+
+    
+end
+
+
+
+@enduml 

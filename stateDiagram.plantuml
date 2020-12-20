@@ -1,0 +1,73 @@
+@startuml stateDiagram
+
+skinparam Style strictuml
+skinparam SequenceMessageAlignment center
+skinparam Linetype polyline
+
+left to right direction
+skinparam BackgroundColor #CAE1FF
+skinparam StateBackgroundColor #f0ffff
+skinparam StateBorderColor #000033
+skinparam ArrowColor #191970
+state "applicationLaunching" as AL
+
+[*] -right-> AL
+
+state "exit" as E
+
+state "login/signUp" as SU
+AL -right-> SU
+
+state "waitingFor\nVerification" as WFV{
+    state "userId" as UI 
+    state "drivingLicence" as DL 
+    state "idProof" as IP 
+}
+SU -right-> UI : verifying username and password
+SU -right-> E : cancel
+UI --> SU : verification Error \n[unauthorized user]
+
+state "recieveUser\nRequest" as RUR
+    
+state "offerRide" as OR{
+    state "take\nStartAddress\nAnd\nEndAddress" as addOR
+    [*] -> addOR
+    addOR -right-> DL : verifying Driving License\n and Government ID
+    state "viewNearby\nRideTakers" as VNRT
+    DL -down-> VNRT : [successful verification]
+    state "sendConfirmation\nand\nRideTakerDetails" as C
+    VNRT -down-> C : accept a ride
+    VNRT --> E : cancel
+    C --> E : applicationClosed
+}
+
+state "findRide" as FR{
+    state "take\nPickupAddress\nAnd\nDropAddress" as addFR
+    [*] -> addFR
+    addFR --> IP : verifying GovernmentID
+    state "viewAvailable\nRideGivers" as VARG
+    IP --> VARG : successful verification\n[authorized user]
+    state "sendConfirmation\nand\nRideGiverDetails" as CG
+    VARG -down-> CG : confirm a ride
+    VARG --> E : cancel 
+    CG --> E : application closed
+}
+
+state "myAccount" as MA{
+
+
+}
+
+WFV -down-> RUR : successful verfication \n[authorized user]
+
+RUR --> E
+RUR --> OR
+RUR --> FR
+RUR --> MA
+
+OR --> RUR
+FR --> RUR
+MA --> RUR
+E --> [*]
+
+@enduml

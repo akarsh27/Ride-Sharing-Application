@@ -1,0 +1,69 @@
+@startuml useCase
+
+left to right direction
+skinparam PackageStyle rectangle
+skinparam Linetype ortho
+skinparam BackgroundColor #CAE1FF
+
+skinparam usecase {
+
+    BackgroundColor white
+    BorderColor  #687C97
+
+    ArrowColor #191970
+
+}
+
+skinparam ActorBackgroundColor #f0ffff
+skinparam ActorBorderColor #000033
+
+skinparam RectangleBackgroundColor<<actor>> #f0ffff
+skinparam style strictuml
+
+actor rideTaker
+actor rideGiver
+actor user
+rectangle company <<actor>>
+
+user <|-- rideTaker
+user <|-- rideGiver
+
+rectangle RideSharingApplication{
+    user -- (signIn/signUp)
+    user --- (myAccount)
+
+    rideTaker -- (findRide)
+
+    rideGiver -- (offerRide)
+
+    (signIn/signUp) .> (verify\nUsernameAndPassword) : <<include>>
+    (signIn/signUp) <.. (verificationError) : <<extend>>
+
+    (myAccount) <|-- (myProfile)
+    (myAccount) <|-- (myRides)
+    (myAccount) <|-- (myPayments)
+    (myAccount) <|-- (myVehicles)
+    
+    (myProfile) *- (profileVerification)
+    (myProfile) o-- (customerCare\nFAQs\nprivacyInfo)
+
+    (findRide) .> (alertNearbyDriver) : <<include>>
+    (findRide) .> (verifyUserID) : <<include>>
+    (findRide) <. (cancelBooking) : <<extend>>
+    (findRide) -- (rideInfo)
+
+    (rideInfo) ..> (paymentInfo) : <<extend>>
+    (rideInfo) - (offerRide)
+
+    (offerRide) ..> (verifyUserID) : <<include>>
+    (offerRide) <.. (cancelBooking) : <<extend>>
+    (offerRide) ..> (viewNearbyRideTakers) : <<include>>
+    
+    (viewNearbyRideTakers) <.. (accept) : <<extend>>
+    (viewNearbyRideTakers) <.. (decline) : <<extend>>
+
+    (myAccount) ----- company
+    (rideInfo) -- company
+}
+
+@enduml

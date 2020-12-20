@@ -1,0 +1,111 @@
+@startuml SequenceDiagram3
+
+skinparam BackgroundColor #CAE1FF
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor #000033
+skinparam ParticipantBackgroundColor #f0ffff
+skinparam ParticipantBorderColor #000033
+skinparam SequenceLifeLineBackgroundColor #75cbec
+skinparam SequenceLifeLineBorderColor #000033
+skinparam ArrowColor #191970
+skinparam Linetype ortho
+skinparam ActorBackgroundColor #f0ffff
+skinparam ActorBorderColor #000033
+participant ":Web Application" order 20
+participant ":Server" order 30
+participant ":Company Database" order 40
+
+participant ":Web Application" order 20
+participant ":Server" order 30
+participant ":Company Database" order 40
+
+
+skinparam style strictuml
+skinparam SequenceMessageAlignment center
+
+title  My Account 
+
+actor User
+
+group MyProfile
+    User -> ":Web Application" : viewMyProfile
+    activate ":Web Application"
+
+    ":Web Application" -> ":Company Database" : get(profileDetails)
+    activate ":Company Database"
+    ":Company Database" -> ":Web Application" : give(profileDetails)
+
+
+    ":Web Application" -->> User : display(name,picture,IDs,contact,email)
+
+    User -> ":Web Application" : updateDrivingLicense
+
+    ":Web Application" -> ":Company Database" : verify(DrivingLicense)
+
+    ":Company Database" -->> ":Server" : Verification Successful
+    activate ":Server"
+    ":Company Database" -->> ":Company Database" : updateDrivingLicense
+    
+
+    ":Server" -->> User : Driving License Updated
+     deactivate ":Server"
+   
+    deactivate ":Company Database"
+    deactivate ":Web Application"
+
+end
+ 
+newpage
+
+group MyVehicles
+
+    User -> ":Web Application" : viewMyVehicles
+    activate ":Web Application"
+
+    ":Web Application" -> ":Company Database" : get(MyVehicleDetails)
+    activate ":Company Database"
+    ":Company Database" -->> ":Web Application" : give(MyVehicleDetails)
+
+    ":Web Application" -->> User : display(vehicleDetails)
+
+    User -> ":Web Application" : AddVehicle(vehicleno,model,colour,image)
+
+
+    ":Web Application" -> ":Company Database" : updateMyVehicles
+
+    ":Company Database" -->> ":Company Database" : updateVehicles
+    
+    ":Server" -->> User : NewVehicleAdded
+    deactivate ":Company Database"
+    deactivate ":Web Application"
+
+end
+
+newpage
+
+group MyRides
+    User -> ":Web Application" : viewMyRides
+    activate ":Web Application"
+    
+    ":Web Application" -> ":Company Database" : get(MyRideDetails)
+    activate ":Company Database"
+    ":Company Database" -->> ":Web Application" : give(MyRideDetails)
+    deactivate ":Company Database"
+    ":Web Application" -->> User : display(MyRideDetails)
+
+    User -> ":Web Application" : CheckRides(date)
+
+    ":Web Application" -> User : displayRides(date)
+
+    deactivate ":Web Application"
+
+end
+
+
+
+
+
+
+
+
+@enduml 

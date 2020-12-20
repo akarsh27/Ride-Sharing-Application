@@ -1,0 +1,68 @@
+@startuml deployment
+
+left to right direction
+skinparam style strictuml
+skinparam Linetype ortho
+
+skinparam BackgroundColor #CAE1FF
+skinparam DatabaseBackgroundColor white
+skinparam DatabaseBorderColor #000033
+skinparam ComponentBackgroundColor #f0ffff
+skinparam ComponentBorderColor #000033
+skinparam PackageBackgroundColor #7EB6FF
+skinparam ArtifactBackgroundColor #75cbec
+skinparam ArtifactBorderColor #000033
+skinparam PackageBorderColor #000033
+skinparam NodeBackgroundColor #92d8f2
+skinparam NodeBorderColor #000033
+skinparam ArrowColor #191970
+skinparam ActorBackgroundColor #f0ffff
+skinparam ActorBorderColor #000033
+skinparam CloudBackgroundColor #d5edf6
+
+node "User" as U{
+    actor RideTaker
+    actor RideGiver
+}
+
+package "Database" as DB{
+    database "SQL Server"
+    database " MongoDB "
+}
+
+node "PaymentGateway" as PG{
+    [Credit/DebitCard]
+    [Net Banking]
+    [E-Wallet]
+}
+cloud "Internet" as I{
+    package "Server" as S{
+    node "Web Server Apache"{
+        artifact "<<artifact>>\n Java Server Pages" as WS
+    }
+
+    node "Application Server Tomcat"{
+        component [<<component>>\nRide Sharing System] as RSS
+    }
+    }   
+}
+
+artifact "FareEstimator" as FE
+artifact "Ratings" as R
+package "Location" as L{
+ 
+    [<<component>>\nMap]
+    [<<component>>\nETA]
+ 
+    [<<component>>\nTrackingDetails]
+}
+
+
+U --> S
+S --[dashed]--> DB
+PG -(0- FE
+FE -[dashed]-> L
+R --> U
+L -(0- DB
+
+@enduml

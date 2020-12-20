@@ -1,0 +1,147 @@
+@startuml classDiagram
+
+skinparam BackgroundColor #CAE1FF
+skinparam ClassBackgroundColor #f0ffff
+skinparam ClassBorderColor #000033
+skinparam ObjectBackgroundColor white
+skinparam ObjectBorderColor #000033
+skinparam ArrowColor #191970
+skinparam Linetype ortho
+
+class authentication{
+ + userName 
+ - password
+ 
+ +google()
+ +facebook()
+ +email()
+ +phoneNo()
+ 
+}
+ 
+class myAccount{
+ +name 
+ +contactNo 
+ +email 
+ +alternativeContactNo
+ 
+ -displayVerificationStatus()
+}
+ 
+class rideTaker{
+ +pickupAddress
+ +destinationAddress
+ +pickupTime
+ 
+ +showNearbyRideGivers()
+ +selectRide()
+ +calculateFare()
+}
+ 
+class rideGiver{
+ +startAddress
+ +endAddress
+ +offerRideTime
+ 
+ +startRide()
+ +showNearbyRideTakers()
+ +endRide()
+ +updateRideInfo()
+ + deleteUserBooking() 
+}
+ 
+class myProfile extends myAccount{
+ -drivingLicence
+ -aadharCard
+ -PAN
+ +profilePicture()
+ 
+ -verifyID()
+ -addGovernmentID()
+ -verifyImage()
+ -verifyEmailID()
+}
+ 
+class myPayments extends myAccount{
+ -googlePay
+ -paytm
+ -ewallet
+ -cash
+ -debitCard
+ -creditCard
+ 
+ -updatePayment()
+}
+ 
+class myVehicles extends myAccount{
+ +vehicleNo
+ +model
+ +color
+ +noOfSeats
+ +vehicleImage
+ 
+ +addCar()
+ +addBike()
+ +getCar()
+ +getBike()
+ +update()
+}
+ 
+class myRides extends myAccount{
+ +ratings
+ 
+ +totalRides()
+ +totalRidesAsRider()
+ +totalRidesAsPassenger()
+}
+ 
+class notification{
+ -contacts
+ -groups
+ -callHistory
+ -notificationBell
+ 
+ -chats()
+}
+ 
+class settings{
+ -changeemail()
+ -changeContactNo()
+ -addAlternateContactNo()
+ -changePassword()
+ +suspendAccount()
+ +setHomeLocation()
+ +setOfficeLocation()
+ +notification()
+ +security()
+ -signOut()
+}
+ 
+object booking{
+ #status
+ 
+ #notifyUser()
+ -updateRideInfo()
+ -displayRideInfo()
+ -cancelBooking()
+ 
+}
+ 
+object rideInfo{
+ +location
+ +vehicleInfo
+ +availableSeats
+ +contactDetails 
+}
+
+rideTaker "1..*" *- "1..*" rideInfo : booked ride
+rideTaker "0..1" --o "1" myAccount
+rideGiver "0..*" o-- "1" myAccount
+settings --* myAccount
+booking "1..*" --* "1..*" rideTaker : booked ride
+booking "1..*" --* "1..*" rideGiver : booked ride
+notification "0..*" --o "1" myAccount
+
+authentication "1..4" -- "1" myAccount : signIn/signUp
+
+@enduml

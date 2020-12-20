@@ -1,0 +1,49 @@
+@startuml SequenceDiagram2
+
+skinparam BackgroundColor #CAE1FF
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor #000033
+skinparam ParticipantBackgroundColor #f0ffff
+skinparam ParticipantBorderColor #000033
+skinparam SequenceLifeLineBackgroundColor #75cbec
+skinparam SequenceLifeLineBorderColor #000033
+skinparam ArrowColor #191970
+skinparam Linetype ortho
+skinparam ActorBackgroundColor #f0ffff
+skinparam ActorBorderColor #000033
+participant ":Web Application" order 20
+participant ":Server" order 30
+participant ":Company Database" order 40
+
+participant ":Web Application" order 20
+participant ":Server" order 30
+participant ":Company Database" order 40
+
+
+skinparam style strictuml
+skinparam SequenceMessageAlignment center
+
+title  CancelBoooking 
+
+actor User
+
+
+User -> ":Web Application" : requestCancellation
+activate ":Web Application"
+
+
+":Web Application" -> ":Company Database" : CancelRide
+
+activate ":Company Database"
+
+":Company Database" -->> ":Server" : cancellationApproved
+activate ":Server"
+
+":Company Database" -->>":Company Database" : updateInfo
+
+":Server" -->> ":Web Application" : notifyBothParties
+deactivate ":Company Database"
+deactivate ":Server"
+":Web Application" -->> User : cancellationConfirmed
+
+@enduml 

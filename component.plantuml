@@ -1,0 +1,85 @@
+@startuml componentDiagram
+
+left to right direction
+skinparam Linetype ortho
+skinparam style strictuml
+
+skinparam BackgroundColor #CAE1FF
+skinparam DatabaseBackgroundColor white
+skinparam DatabaseBorderColor #000033
+skinparam ComponentBackgroundColor #f0ffff
+skinparam ComponentBorderColor #000033
+skinparam PackageBackgroundColor #7EB6FF
+skinparam InterfaceBackgroundColor #75cbec
+skinparam InterfaceBorderColor #000033
+skinparam PackageBorderColor #000033
+skinparam ArrowColor #191970
+skinparam Linetype ortho
+ 
+database "Database" as DB{
+ [SQL Server] 
+ [MongoDB] 
+}
+ 
+component GUI[
+ <<subsystem>>
+ GUI
+]
+
+package "Payment Gateway" as PG{
+    [Credit/DebitCard]
+    [Net Banking]
+    [E-Wallet]
+    () "NFC"
+    () "QR Code" 
+}
+
+component Ac[
+ <<component>>
+ Account 
+]
+
+component Sec[
+ <<component>>
+ Security 
+]
+ 
+package "Location" as L{
+ 
+[<<component>>\nMap]
+[<<component>>\nETA]
+ 
+[<<component>>\nTrackingDetails]
+}
+ 
+component "Schedule" as Sc{
+ [currentRide]
+}
+
+component "AuthenticationActivity" as AA{
+ [Signin]
+ [SignUp]
+}
+component St[
+ <<component>>
+ Settings
+]
+component EM[
+ <<component>>
+ EcoMeter
+]
+ 
+AA -(0- Ac : credentials
+Sec --o St : securityFeatures
+GUI --(0-- DB : info
+Ac -(0- Sc : scheduledRides
+Ac -(0- St : AccountSettings
+EM ..> Ac : contributionToEnvironment
+L ---(0--- DB : details
+[Signin] .> [SignUp]
+[<<component>>\nTrackingDetails] .> [<<component>>\nMap]
+[<<component>>\nTrackingDetails] ..> [<<component>>\nETA]
+Ac -(0--- DB : accountDetails
+PG ---(0--- [currentRide] : fareDetails
+ 
+@enduml
